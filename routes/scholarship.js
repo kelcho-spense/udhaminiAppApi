@@ -1,59 +1,71 @@
 const router = require('express').Router();
-const User = require('../models/User');
-const bcrypt = require('bcrypt'); 
+const Scholarship = require('../models/Scholarship');
+//Create
+router.post('/register', async (req, res) => {
+    const newScolarship = new Scholarship(req.body);
+    try {
+        const savedScholarship = await newScolarship.save();
+        res.status(200).json(savedScholarship);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
 //UPDATE
-router.put("/:id",async (req,res)=>{
-    if(req.body.userId == req.params.id){
-        if(req.body.password){
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(req.body.password,salt);
-            req.body.password = hashedPassword;
-        }
-        try{
-            const updatedUser = await User.findByIdAndUpdate(req.params.id,{
-              $set: req.body,
-            },{new: true});
-            res.status(200).json(updatedUser);            
-        }catch(err){
+router.put("/:id", async (req, res) => {
+    const ScolarshipExist = await Scholarship.findById(req.params.id); //check if the scholarship exists via id
+    if (ScolarshipExist) {
+        try {
+            const updatedScolarship = await Scholarship.findByIdAndUpdate(req.params.id, {
+                $set: req.body,
+            }, { new: true });
+            res.status(200).json(updatedScolarship);
+        } catch (err) {
             res.status(500).json(err);
         }
     } else {
-        res.status(401).json("Unauthorized:you can only update your account!");
-    }   
+        res.status(404).json("scholarship doesnt exist!");
+    }
 });
 
 //DELETE
-router.delete("/:id", async (req,res)=>{
-    if(req.body.userId == req.params.id){
+router.delete("/:id", async (req, res) => {
+    const ScolarshipExist = await Scholarship.findById(req.params.id); //check if the scholarship exists via id
+    if (ScolarshipExist) {
         try {
-            const user = await User.findById(req.params.id); //check if the user exists via id
-            try{
-                await Post.deleteMany({username:User.username}); //in Post schema, we use username and compares usernames in User schema then delete if they exist
-                await User.findByIdAndDelete(req.params.id);    //we delete the user via id        
-                res.status(200).json("User has been deleted!");
-             }catch(err){
-                res.status(500).json(err);
-            }
-            
-        } catch (error) {
-            res.status(500).json("user not found!");            
+            await Scholarship.findByIdAndDelete(req.params.id);    //we delete the user via id        
+            res.status(200).json("scholarship has been deleted!");
+        } catch (err) {
+            res.status(500).json(err);
         }
-        
-        
     } else {
-        res.status(401).json("Unauthorized:you can only delete on your account!");
+        res.status(404).json("scholarship doesnt exist!");
     }
-   
+});
+//GET all scholarship
+router.get("/all", async (req, res) => {
+    try {
+        const allScholarships = await Scholarship.find();
+        if (allScholarships.length > 0) {
+            res.status(200).json(allScholarships);
+        } else {
+            res.status(200).json("no scholarships found");
+        }
+    } catch (err) {
+        res.status(500).json(err);
+    }
 });
 
-//GET USER
-router.get("/:id",async (req,res)=>{
+//GET One Scholarship
+router.get("/:id", async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
-        const { password ,...others} = user._doc;
-        res.status(200).json(others);
+        const ScolarshipExist = await Scholarship.findById(req.params.id);
+        if (ScolarshipExist) {
+            res.status(200).json(ScolarshipExist);
+        } else {
+            res.status(404).json("scholarship doesnt exist!");
+        }
     } catch (error) {
-        res.status(500).json("user not found!");
+        res.status(500).json(error);
     }
 });
 module.exports = router

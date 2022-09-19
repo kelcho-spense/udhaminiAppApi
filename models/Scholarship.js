@@ -5,7 +5,7 @@ const ScholarshipSchema = new mongoose.Schema({
             required: true,
         },
         amount:{
-            type: number,
+            type: String,
             required: false,
         },
         study_level: {
