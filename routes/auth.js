@@ -4,11 +4,13 @@ const bcrypt = require('bcrypt');
 
 //REGISTER
 router.post('/register', async (req, res) => {
+    // res.status(200).json({ message: "Register" });
     try {
         const existingUser = await User.findOne({ username: req.body.username });
         if (!existingUser) {
             const existingEmail = await User.findOne({ email: req.body.email });
             if (!existingEmail) {
+                const salt = await bcrypt.genSalt(10);  
                 const hashedPass = await bcrypt.hash(req.body.password, salt);
                 const newUser = new User({
                     fullname: req.body.fullname,
@@ -22,18 +24,18 @@ router.post('/register', async (req, res) => {
                     email: req.body.email,
                     password: hashedPass,
                 });
-                const salt = await bcrypt.genSalt(10);            
+                     
                 const user = await newUser.save();
                 const { password, ...others } = user._doc;
                 res.status(200).json(others);
             } else {
-                return res.send("Email already taken"); 
+                return res.status(401).send("Email already taken"); 
             }            
         } else {
-            return res.send("Username already taken");
+            return res.status(401).send("Username already taken");
         }
     } catch (err) {
-        res.status(500).json(err);
+        res.status(500).send("Server error");
     };
 });
 //LOGIN
@@ -53,7 +55,7 @@ router.post('/login', async (req, res) => {
             res.status(400).json("Wrong Credentials");
         }
     } catch (err) {
-        res.status(500).json(err);
+        res.status(500).send("Server error");
     };
     });
 

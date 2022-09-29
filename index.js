@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
+const cors = require('cors');
 const authRoute = require('./routes/auth');
 const userRoute = require('./routes/users');
 const scholarshipRoute = require('./routes/scholarship');
@@ -13,7 +14,7 @@ const scholarshipRoute = require('./routes/scholarship');
 dotenv.config();
 app.use(express.json()); //app is able to send JSON requests
 app.use("/images", express.static(path.join(__dirname, '/images'))); //using path lib to acess images in folders
-
+app.use(cors());
 //connect to mongodb
 mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,

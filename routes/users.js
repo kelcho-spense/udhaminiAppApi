@@ -43,7 +43,7 @@ router.put("/:id", async (req, res) => {
                 $set: req.body,
             }, { new: true });
             const { password, ...others } = updatedUser._doc;
-            res.status(200).json(others);
+            res.status(200).json("User Update Successful");
         } catch (err) {
             res.status(500).json(err);
         }
@@ -53,8 +53,8 @@ router.put("/:id", async (req, res) => {
 });
 //DELETE
 router.delete("/:id", async (req, res) => {
-    if (req.body.userId == req.params.id) {
-        const user = await User.findById(req.params.id); //check if the user exists via id        
+    const user = await User.findById(req.params.id); //check if the user exists via id   
+    if (req.body.userId == req.params.id) {             
         if (user) {
             try {
                 await User.findByIdAndDelete(req.params.id);   //we delete the user via id  
