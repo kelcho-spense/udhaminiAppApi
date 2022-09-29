@@ -12,6 +12,10 @@ const ScholarshipSchema = new mongoose.Schema({
             type: String,
             required: true,
         },
+        link: {
+            type: String,
+            required: true,
+        },
         origin_country: {
             type: String,
             required: true,
