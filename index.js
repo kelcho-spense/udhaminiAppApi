@@ -8,13 +8,14 @@ const cors = require('cors');
 const authRoute = require('./routes/auth');
 const userRoute = require('./routes/users');
 const scholarshipRoute = require('./routes/scholarship');
+const corsOptions = require('./config/corsOptions')
 
 
 //middlewares
 dotenv.config();
 app.use(express.json()); //app is able to send JSON requests
 app.use("/images", express.static(path.join(__dirname, '/images'))); //using path lib to acess images in folders
-app.use(cors());
+app.use(cors(corsOptions));
 //connect to mongodb
 mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
@@ -42,6 +43,12 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/scholarship", scholarshipRoute); //api/scholarship/register
+app.all('*',(req, res) => {
+    res.status(404)
+    if (req.accepts('html') || req.accepts('json') || req.accepts('txt')){
+        res.json({message: '404 Not Found'})
+    }
+})
 
 //server running port
 app.listen(process.env.PORT || 5000, () => {
